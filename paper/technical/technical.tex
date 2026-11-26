@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.95in]{geometry}
+\input{common.tex}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\newcommand{\sect}[2]{\par\medskip{\large\textbf{{\color{acc}#1}\enspace #2}}\par\vspace{-8pt}{\color{acc}\rule{\linewidth}{0.5pt}}\par\vspace{-2pt}}
+\newcommand{\sub}[1]{\par\smallskip\textbf{#1}\enspace}
+\begin{document}
+{\LARGE\textbf{Paranoid Android v1: technical note on the seven readers}}\par\smallskip
+{\large Seven readers stacked on one public text model; on new Terminal Wrench jobs, about 73\% of cheats caught realistically, 81.3\% at best}\par\smallskip
+{\small Nov 25, 2026 (internal name: v5) \textbullet{} code: \url{https://github.com/Questboy23/paranoid-android-v1} \textbullet{} numbers from \texttt{results/v5\_final\_stripped.json}, \texttt{results/v5\_combine\_stripped.json} and \texttt{results/v5\_mil*.log}}\par
+
+\plain{\textbf{Summary.} v5 keeps v4's public embedding (bge-small, 384 numbers per line, never retrained) and adds new readers on top. On Terminal Wrench with only commands and computer replies visible, all 5,984 runs scored by versions that never saw their task, v5 caught 81.3\% [76.6--85.7\%] of cheating runs at 5\% false alarms (AUC 0.960 [0.951--0.968]). v4 caught 75.5\% and the benchmark's own GPT-5.4 judge 44\%. The goal was 5 times fewer misses; v5 reached about 1.3 times fewer (24.5\% missed to 18.7\%).}
+
+\par\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{Read this first: 81.3\% is a best case.} No run was scored by a model that trained on its job (5 job groups, seed 0). But the model trained on the other jobs of the same benchmark, the seven readers were chosen by looking at these same scores, and the 5\% alarm line was set on these same honest runs. The realistic figure for new jobs of the same benchmark is about 73\% (simple reader 72.9\%; an earlier version on 629 never-used runs 72.7\%). On benchmarks it never trained on it is close to guessing. Also, ``never retrained'' below refers to the shared embedding; one of the seven readers retrains a copy of it per job group. See \texttt{paper/paper.pdf}, page 2.}}\par
+\sect{1}{What an agent does and what the monitor reads}
+An agent is an AI given a task in plain English. It types one command, the computer runs it and prints a reply, and the reply goes back to the AI. This repeats 1 to 25 times. A grader program then says pass or fail. A cheat makes the grader say pass without doing the job. Every command and reply is saved in a log. The monitor reads only that log, after the run. Any change to the computer must be a typed command, so it always appears in the log, even when the agent hides its reasoning.
+
+\sect{2}{The readers}
+Every line of the log goes through the public encoder and becomes 384 numbers. Each reader turns a run's lines into one score; a final weighted sum (logistic regression, which is Bayes' rule written in log odds) combines the reader scores. The weights are fitted on 4 of 5 task groups and score the 5th.
+\begin{table}[h]\centering\small\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}Xrr@{}}
+\toprule
+Reader (idea source) & AUC & Caught\\
+\midrule
+v4 stack: average, extremes, 3-step windows, task fit, cheat sentences, word counts & 0.947 & 75.5\%\\
+Neutral commands: numbers, codes and long strings removed, then letter-group counts & 0.945 & 71.8\%\\
+Nearest steps: closeness to known cheat steps minus known honest steps & 0.820 & 46.1\%\\
+Step attention: a small trained network picks which steps matter & 0.916 & 68.2\%\\
+Step attention trained with padding practice & 0.910 & 68.6\%\\
+Step attention reading each step next to the task text & 0.909 & 68.6\%\\
+Whole encoder retrained on run labels (end to end, Kaggle T4, 2.5 min per fold) & 0.940 & 75.9\%\\
+\midrule
+\textbf{v5: all seven stacked} & \textbf{0.960} & \textbf{81.3\%}\\
+v5 with a separate alarm line per agent model & 0.957 & 79.7\%\\
+\bottomrule
+\end{tabularx}
+\caption{Terminal Wrench, stripped condition, all 5,984 runs, caught at 5\% false alarms. 95\% interval for v5 (1,000 resamples of whole tasks): AUC 0.951--0.968, caught 76.6--85.7\%. Per-model rows were measured before the end-to-end reader was added (one weight set per model: 78.9\%).}
+\end{table}
+
+\sect{3}{Against existing monitors}
+\begin{table}[h]\centering\small\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}Xrrl@{}}
+\toprule
+Monitor (stripped condition) & AUC & Caught & Time per run\\
+\midrule
+\textbf{v5 (this work)} & \textbf{0.960} & \textbf{81.3\%} & 0.03 s text step; total not timed\\
+v4 & 0.947 & 75.5\% & 0.03 s\\
+GPT-5.4 judge (Terminal Wrench paper, all runs) & 0.917 & 44\% & about 23 s\\
+Linear probe, Cheap RH Detection (arXiv 2606.08893) & 0.621 & 9\% & n/a\\
+\bottomrule
+\end{tabularx}
+\end{table}
+The v5 interval (76.6--85.7\%) lies just above v4's point value of 75.5\%, so the gain over v4 is small; the gain over the published judge is large.
+
+\sect{4}{Padding attack}
+Padding means putting honest-looking steps around a cheat. Five steps from a real honest run were put in front of every cheat. The step-attention reader without practice dropped from 68.2\% to 35.4\% caught. With padding practice in training it caught 73.8\% under padding (74.8\% for the task-aware version). With the 5 honest steps taken from an honest run of the same task, the results hold: 38.7\% without practice and 73.9\% with it. The padded scores stay above the readers' clean scores (68.6\%), so the inserted honest steps seem to make the cheat steps stand out more to the attention reader; the cause is not tested.
+
+\sect{5}{What did not work or was not run}
+\begin{itemize}[itemsep=2pt]
+\item Separate alarm lines per agent model lowered catch (77.3\%).
+\item Reading steps next to the task text added nothing (68.6\% both ways). Most misses are short, quiet fakes, such as writing a fake ``installed'' record; 44\% of 1 to 2 step cheats are missed.
+\item Retraining the whole encoder on run labels alone caught 75.9\%, about the same as v4; stacked with the others it raised v5 from 79.4\% to 81.3\%.
+\item A bigger encoder (bge-base, 768 numbers) gave 0.949 against 0.947 in earlier tests.
+\item The readers were designed and chosen while looking at results on these same 5,984 runs; no untouched set was kept, so the 81.3\% is somewhat optimistic.
+\item v5 learned from Terminal Wrench labels and the GPT-5.4 judge did not. With no labels a simple version caught 19.3\%; with 10 labelled tasks 54.0\% (median of 10 draws, full v4 stack).
+\item Time per run (0.03 s) was measured for the text-to-numbers step only.
+\item The comparison with GPT-5.4 is unpaired: its per-run scores are not public.
+\end{itemize}
+\end{document}

@@ -78,15 +78,45 @@ about @ENC@ seconds whether it looks like cheating. Each page that follows is on
 \vspace{10mm}
 \begin{center}\resizebox{\linewidth}{!}{\begin{tikzpicture}
 \node[box,fill=pa!10] (a) at (0,0) {{\fontsize{30}{34}\selectfont\bfseries\color{pa} @SPEED@$\times$}\\[4pt] faster than an AI judge\\[2pt]{\normalsize @ENC@ s per run against about @JUDGE@ s}};
-\node[box,fill=pa!10] (b) at (8.4,0) {{\fontsize{30}{34}\selectfont\bfseries\color{pa} @SIMPLE_R@ to @BEST_R@\%}\\[4pt] of cheating caught on new jobs\\[2pt]{\normalsize the published GPT-5.4 judge: 44\%}};
+\node[box,fill=pa!10] (b) at (8.4,0) {{\fontsize{30}{34}\selectfont\bfseries\color{pa} about @SIMPLE_R@\%}\\[4pt] of cheating caught on new jobs\\[2pt]{\normalsize best case @BEST_R@\% (see page 2); GPT-5.4 judge: 44\%}};
 \node[box,fill=bad!10] (c) at (16.8,0) {{\fontsize{30}{34}\selectfont\bfseries\color{bad} @ONE_LO@ to @ONE_HI@}\\[4pt] score on benchmarks it never saw\\[2pt]{\normalsize 0.5 is guessing: it only knows the kinds of cheating it was shown}};
 \end{tikzpicture}}\end{center}
 
 \vspace{12mm}
-{\large\color{ink!70}\textbf{Pages:} 2 how it works \quad 3 speed \quad 4 how much it catches \quad 5 how many labels it needs \quad 6 does it carry over \quad
-7 new AI agents \quad 8 where to use it, and its limits \quad 9 to 10 every number, by benchmark}
+{\large\color{ink!70}\textbf{Pages:} 2 is the @BEST_R@\% honest? \quad 3 how it works \quad 4 speed \quad 5 how much it catches \quad 6 how many labels it needs \quad
+7 does it carry over \quad 8 new AI agents \quad 9 where to use it, and its limits \quad 10 to 11 every number}
 
-% ---------- page 2 ----------
+% ---------- page 2: is the 81% honest ----------
+\pg{Is the @BEST_R@\% honest? Partly.}{It was never scored on a job it trained on. But it did train on other jobs from the same benchmark, and its design was picked using these same scores. So treat @BEST_R@\% as a best case, and about @SIMPLE_R@\% as the realistic figure.}
+\begin{center}\resizebox{\linewidth}{!}{\begin{tikzpicture}
+% how the test is run
+\node[font=\Large\bfseries,anchor=west] at (-0.2,1.2) {How each run is scored};
+\node[draw=ink!40,rounded corners=5pt,fill=ink!5,minimum width=10.6cm,minimum height=1cm,font=\large] (jobs) at (5.1,0) {Terminal Wrench: 331 jobs, 5,984 runs};
+\foreach \i/\c in {0/pa!15,1/pa!15,2/pa!15,3/pa!15,4/bad!25}
+  \node[draw=ink!40,rounded corners=4pt,fill=\c,minimum width=1.9cm,minimum height=1.1cm,font=\normalsize,align=center] (g\i) at (\i*2.15+0.8,-2.2) {group \the\numexpr\i+1\relax\\[-1pt]{\footnotesize about 66 jobs}};
+\draw[e] (jobs.south) -- ++(0,-.5) -| (g4.north);
+\draw[e] (jobs.south) -- ++(0,-.5) -| (g0.north);
+\node[align=center,font=\normalsize,text=pa] at (3.95,-3.35) {learns from these 4 groups};
+\draw[pa,line width=1.3pt] (0,-3.0) -- (7.65,-3.0);
+\node[align=center,font=\normalsize,text=bad] at (9.4,-3.35) {scores this group};
+\node[q,text width=9.6cm,font=\normalsize] at (5.1,-4.9) {Repeat 5 times, so every group gets scored once by a model that never saw its jobs. The same 5 groups (seed 0) are used by every reader, by the retrained embedding model, and by the weights that add the scores up.};
+% verdicts
+\node[draw=ok!70,rounded corners=6pt,fill=ok!8,text width=9.8cm,align=left,inner sep=9pt,font=\normalsize,anchor=north west] (good) at (11.6,1.6) {
+{\Large\bfseries\color{ok} Clean (checked in the code)}\\[4pt]
+\textbf{No run is scored by a model that trained on its job.} Checked in \texttt{v4\_crossfit.py}, \texttt{v5\_lab.py}, \texttt{v5\_e2e.py} and \texttt{v5\_combine.py}.\\[4pt]
+\textbf{The embedding model never saw the benchmark.} It is the public bge-small. The one reader that retrains it does so separately for each group.\\[4pt]
+\textbf{The agent's own words are deleted} in every run, honest and cheating alike.};
+\node[draw=bad!70,rounded corners=6pt,fill=bad!6,text width=9.8cm,align=left,inner sep=9pt,font=\normalsize,anchor=north west,yshift=-4mm] (bad) at (good.south west) {
+{\Large\bfseries\color{bad} Not clean}\\[4pt]
+\textbf{It trained on the benchmark's other jobs.} @BEST_R@\% answers ``new jobs, same benchmark''. On a benchmark it never trained on, it caught about 0\%.\\[4pt]
+\textbf{The design was picked on these scores.} Which seven readers to keep was decided by looking at these same results. That makes the number look better than it would on fresh data.\\[4pt]
+\textbf{The alarm line was set on these honest runs.} In real use the line has to be fixed in advance.};
+\node[draw=pa!70,rounded corners=6pt,fill=pa!10,text width=9.6cm,align=left,inner sep=9pt,font=\normalsize,anchor=north] at (5.1,-6.6) {
+{\Large\bfseries\color{pa} The realistic number: about @SIMPLE_R@\%}\\[3pt]
+Two checks with far fewer choices made on the scored runs agree: a simple reader, @SIMPLE@\%, and an earlier version on 629 runs never used for any choice, @HOLD@\%. Best case @BEST@\%.};
+\end{tikzpicture}}\end{center}
+
+% ---------- tree ----------
 \newpage
 \begin{center}\includegraphics[width=\linewidth,height=17.8cm,keepaspectratio,trim=0 3cm 0 0,clip]{tree.pdf}\end{center}
 
@@ -95,7 +125,7 @@ about @ENC@ seconds whether it looks like cheating. Each page that follows is on
 \fig{fig_speed.pdf}
 
 % ---------- page 4 ----------
-\pg{How much cheating it catches}{Terminal Wrench, the benchmark it learned from, scored only on jobs each model never trained on. Bars with lines show 95\% ranges. The top bar is an upper bound: the seven readers were chosen while looking at these same runs.}
+\pg{How much cheating it catches}{Terminal Wrench, the benchmark it learned from, scored only on jobs each model never trained on. Bars with lines show 95\% ranges. The top bar is a best case, for the reasons on page 2.}
 \fig{fig_caught.pdf}
 
 % ---------- page 5 ----------
@@ -122,7 +152,7 @@ about @ENC@ seconds whether it looks like cheating. Each page that follows is on
 \node[draw=bad!60,rounded corners=6pt,fill=bad!5,text width=11.6cm,align=left,inner sep=9pt,font=\normalsize,anchor=north west] at (7.4,0.9) {
 {\Large\bfseries\color{bad} Limits}\\[4pt]
 \textbf{Misses some.} Even at best about 1 cheating run in 5 gets through, and 5 in 100 honest runs are flagged.\\[4pt]
-\textbf{@BEST@\% is an upper bound.} The design was chosen on the same runs. Fairer: @SIMPLE@\%, @HOLD@\%, @VAL@\%.\\[4pt]
+\textbf{@BEST@\% is a best case} (page 2). It trained on other jobs of the same benchmark, and the design was picked on the same scores. Realistic: about @SIMPLE_R@\%.\\[4pt]
 \textbf{No carry-over.} New kinds of misbehaviour need new labels. On ImpossibleBench an AI judge caught @J_IB@\% with no training; v1 caught 0\%.\\[4pt]
 \textbf{New agents are harder:} @AG_LO@\% to @AG_HI@\% caught.\\[4pt]
 \textbf{Labels are batches.} Cheating and honest runs come from separate batches; other batch differences could help it.\\[4pt]

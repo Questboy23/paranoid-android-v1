@@ -3,7 +3,7 @@
 A fast, cheap monitor that flags AI agents that cheat a grader. It reads a saved agent run, turns it into word embeddings with a small free model (bge-small-en-v1.5), and adds up seven simple scores. No AI judge is needed.
 
 **Paper:** [paper/paper.pdf](paper/paper.pdf) (10 landscape pages: one picture per page, then every number by benchmark).
-**One-page diagram:** [paper/tree.pdf](paper/tree.pdf).
+**One-page diagram:** [paper/tree.pdf](paper/tree.pdf). **Technical note on the seven readers:** [paper/technical/technical.pdf](paper/technical/technical.pdf).
 
 ## Results in short
 
@@ -11,11 +11,11 @@ A fast, cheap monitor that flags AI agents that cheat a grader. It reads a saved
 |---|---|---|
 | Time per run | about 0.03 s on a laptop | about 23 s |
 | One million runs | about 9 hours | about 266 days |
-| Terminal Wrench, new jobs, caught at 5% false alarms | 72.9% to 81.3% | 44% (published GPT-5.4 judge) |
+| Terminal Wrench, new jobs, caught at 5% false alarms | about 73% (81.3% best case, see paper page 2) | 44% (published GPT-5.4 judge) |
 | Same kind of cheating, new jobs (AUC): Terminal Wrench / MALT / ImpossibleBench | 0.86 / 0.90 / 0.84 | |
 | A benchmark it never trained on (AUC) | 0.49 to 0.71, almost nothing caught | 94% caught on ImpossibleBench |
 
-It works well on new cases of the kinds of cheating it was trained on. It does not carry over to new kinds of misbehaviour, and the 81.3% is an upper bound (the design was chosen on the same runs). The paper lists every limit.
+It works well on new cases of the kinds of cheating it was trained on. It does not carry over to new kinds of misbehaviour. The 81.3% is a best case: no run was scored by a model trained on its job, but it trained on other jobs of the same benchmark and its design was picked on the same scores. The paper lists every limit.
 
 Version 2 adds an AI judge and rule-based checks on top of this layer.
 
