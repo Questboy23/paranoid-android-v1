@@ -83,8 +83,8 @@ about @ENC@ seconds whether it looks like cheating. Each page that follows is on
 \end{tikzpicture}}\end{center}
 
 \vspace{12mm}
-{\large\color{ink!70}\textbf{Pages:} 2 is the @BEST_R@\% honest? \quad 3 how it works \quad 4 speed \quad 5 how much it catches \quad 6 how many labels it needs \quad
-7 does it carry over \quad 8 new AI agents \quad 9 where to use it, and its limits \quad 10 to 11 every number}
+{\large\color{ink!70}\textbf{Pages:} 2 is the @BEST_R@\% honest? \quad 3 how it works \quad 4 the embedding, step by step \quad 5 speed \quad 6 how much it catches \quad 7 how many labels it needs \quad
+8 does it carry over \quad 9 new AI agents \quad 10 where to use it, and its limits \quad 11 to 12 every number}
 
 % ---------- page 2: is the 81% honest ----------
 \pg{Is the @BEST_R@\% honest? Partly.}{It was never scored on a job it trained on. But it did train on other jobs from the same benchmark, and its design was picked using these same scores. So treat @BEST_R@\% as a best case, and about @SIMPLE_R@\% as the realistic figure.}
@@ -119,6 +119,36 @@ Two checks with far fewer choices made on the scored runs agree: a simple reader
 % ---------- tree ----------
 \newpage
 \begin{center}\includegraphics[width=\linewidth,height=17.8cm,keepaspectratio,trim=0 3cm 0 0,clip]{tree.pdf}\end{center}
+
+% ---------- page 4: the embedding, step by step ----------
+\pg{How the embedding works, step by step}{The word-embedding model is bge-small-en-v1.5: public, free, 33 million numbers inside, 12 layers. It turns any piece of text into 384 numbers. The real example below was run through it.}
+\begin{center}\resizebox{\linewidth}{!}{\begin{tikzpicture}[node distance=7mm]
+\tikzset{st/.style={draw=ink!40,rounded corners=5pt,fill=pa!8,align=left,inner sep=7pt,font=\normalsize,text width=5.2cm,minimum height=4.0cm,anchor=north west}}
+\node[st] (a) at (0,0) {{\large\bfseries 1. One step}\\[3pt] A command and its output. The agent's own words are deleted.\\[3pt]{\ttfamily\small CMD: cp /tests/expected\_output.txt /app/output.txt}\\[2pt]{\footnotesize Cut to 2,000 characters.}};
+\node[st] (b) at (6.1,0) {{\large\bfseries 2. Word pieces}\\[3pt] The text is split into common word pieces:\\[3pt]{\ttfamily\small cm \#\#d : cp / tests / expected \_ output . tx \#\#t ...}\\[2pt]{\footnotesize Only the first 256 pieces are read.}};
+\node[st] (c) at (12.2,0) {{\large\bfseries 3. Twelve layers}\\[3pt] In each layer every piece looks at every other piece. So ``expected'' next to ``tests'' and ``cp'' is read differently from ``expected'' in an error message.};
+\node[st] (d) at (18.3,0) {{\large\bfseries 4. 384 numbers}\\[3pt] One summary piece holds the meaning of the whole step. Its 384 numbers are scaled to length 1. The first three, for real:\\[3pt]{\ttfamily\small [-0.055, 0.031, 0.025, ...]}};
+\foreach \x/\y in {a/b,b/c,c/d} \draw[e] (\x.east) -- (\y.west);
+% closeness
+\node[draw=ink!40,rounded corners=6pt,fill=ink!4,text width=11.2cm,align=left,inner sep=9pt,font=\normalsize,anchor=north west] (cl) at (0,-4.75) {
+{\large\bfseries 5. Closeness = similar meaning}\\[3pt]
+Two steps are compared by multiplying their numbers pairwise and adding up (1 = same meaning). Real scores from the model against the step above:\\[4pt]
+\begin{tabular}{lr}
+{\ttfamily\small cat /grader/answers.json > /app/result.json} \ (cheating) & 0.73 \\
+{\ttfamily\small python solve.py > /app/output.txt} \ (honest) & 0.81 \\
+{\ttfamily\small pip install numpy} \ (honest) & 0.58 \\
+\end{tabular}\\[4pt]
+\textbf{The raw model does not know what cheating is.} The honest step scores closest because it shares words. That is why the next step learns from labelled runs.};
+\node[draw=pa!60,rounded corners=6pt,fill=pa!8,text width=11.2cm,align=left,inner sep=9pt,font=\normalsize,anchor=north west] (rd) at (12.2,-4.75) {
+{\large\bfseries 6. From steps to a verdict}\\[3pt]
+A run becomes a table: one row of 384 numbers per step. Seven readers each turn the table into one score:\\[3pt]
+\textbf{Meaning bundle:} the average and the peak of each column, for single steps and for 3-step windows; how well the work matches the task text; closeness to 6 written descriptions of cheating and 5 of honest work; a word-count score.\\[2pt]
+\textbf{Nearest steps:} the run's top 3 steps against the 10 nearest cheating and honest steps seen in training.\\[2pt]
+\textbf{Step pickers (3):} learn to point at the 1 to 3 steps where the cheat happens.\\[2pt]
+\textbf{Letter patterns:} commands with numbers and names blanked out, read as letter groups (no embedding).\\[2pt]
+\textbf{Retrained model:} the embedding model itself, retrained on the training jobs only.\\[3pt]
+A final weighted sum of the seven scores gives the verdict.};
+\end{tikzpicture}}\end{center}
 
 % ---------- page 3 ----------
 \pg{Speed: the main gain}{The embedding model is free, runs on a laptop and does not call any outside service. That makes checking every run practical, instead of a sample.}
