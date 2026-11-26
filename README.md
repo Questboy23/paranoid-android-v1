@@ -2,7 +2,7 @@
 
 A fast, cheap monitor that flags AI agents that cheat a grader. It reads a saved agent run, turns it into word embeddings with a small free model (bge-small-en-v1.5), and adds up seven simple scores. No AI judge is needed.
 
-**Paper:** [paper/paper.pdf](paper/paper.pdf) (6 pages, plain language, all benchmark results in Appendix A).
+**Paper:** [paper/paper.pdf](paper/paper.pdf) (10 landscape pages: one picture per page, then every number by benchmark).
 **One-page diagram:** [paper/tree.pdf](paper/tree.pdf).
 
 ## Results in short
@@ -34,7 +34,7 @@ Version 2 adds an AI judge and rule-based checks on top of this layer.
 | `cross_bench.py` | Train on one or two benchmarks, test on another. Uses the version 2 data loaders. |
 | `judge.py` | AI-judge baseline. |
 | `results/*.json` | Every number in the paper. |
-| `paper/gen_paper.py` | Rebuilds the paper from `results/`: `python3 paper/gen_paper.py && cd paper && tectonic paper.tex` |
+| `paper/gen_paper.py` | Rebuilds the paper from `results/`: `python3 paper/gen_figs.py && python3 paper/gen_paper.py && cd paper && tectonic paper.tex` |
 
 Every score comes from a model that never trained on that run's job (5 job groups, seed 0, `splits.json`).
 
