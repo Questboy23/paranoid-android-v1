@@ -1,0 +1,130 @@
+{
+ "train malt -> test tw": {
+  "auc": 0.548,
+  "auc_ci": [
+   0.533,
+   0.563
+  ],
+  "caught_line_from_train": 0.0,
+  "false_alarms_line_from_train": 0.0,
+  "caught_line_from_test_honest": 0.05
+ },
+ "train ib -> test tw": {
+  "auc": 0.49,
+  "auc_ci": [
+   0.475,
+   0.505
+  ],
+  "caught_line_from_train": 0.001,
+  "false_alarms_line_from_train": 0.003,
+  "caught_line_from_test_honest": 0.019
+ },
+ "train malt+ib -> test tw": {
+  "auc": 0.516,
+  "auc_ci": [
+   0.501,
+   0.531
+  ],
+  "caught_line_from_train": 0.001,
+  "false_alarms_line_from_train": 0.001,
+  "caught_line_from_test_honest": 0.038
+ },
+ "train tw -> test malt": {
+  "auc": 0.706,
+  "auc_ci": [
+   0.677,
+   0.732
+  ],
+  "caught_line_from_train": 0.0,
+  "false_alarms_line_from_train": 0.0,
+  "caught_line_from_test_honest": 0.172
+ },
+ "train ib -> test malt": {
+  "auc": 0.552,
+  "auc_ci": [
+   0.521,
+   0.579
+  ],
+  "caught_line_from_train": 0.145,
+  "false_alarms_line_from_train": 0.133,
+  "caught_line_from_test_honest": 0.052
+ },
+ "train tw+ib -> test malt": {
+  "auc": 0.641,
+  "auc_ci": [
+   0.611,
+   0.67
+  ],
+  "caught_line_from_train": 0.002,
+  "false_alarms_line_from_train": 0.0,
+  "caught_line_from_test_honest": 0.074
+ },
+ "train tw -> test ib": {
+  "auc": 0.518,
+  "auc_ci": [
+   0.415,
+   0.614
+  ],
+  "caught_line_from_train": 0.0,
+  "false_alarms_line_from_train": 0.0,
+  "caught_line_from_test_honest": 0.0
+ },
+ "train malt -> test ib": {
+  "auc": 0.639,
+  "auc_ci": [
+   0.539,
+   0.733
+  ],
+  "caught_line_from_train": 0.094,
+  "false_alarms_line_from_train": 0.017,
+  "caught_line_from_test_honest": 0.156
+ },
+ "train tw+malt -> test ib": {
+  "auc": 0.5,
+  "auc_ci": [
+   0.396,
+   0.609
+  ],
+  "caught_line_from_train": 0.0,
+  "false_alarms_line_from_train": 0.0,
+  "caught_line_from_test_honest": 0.062
+ },
+ "same benchmark tw (new tasks)": {
+  "auc": 0.862,
+  "auc_ci": [
+   0.852,
+   0.871
+  ],
+  "caught_line_from_test_honest": 0.498
+ },
+ "same benchmark malt (new tasks)": {
+  "auc": 0.904,
+  "auc_ci": [
+   0.886,
+   0.921
+  ],
+  "caught_line_from_test_honest": 0.57
+ },
+ "same benchmark ib (new tasks)": {
+  "auc": 0.841,
+  "auc_ci": [
+   0.776,
+   0.897
+  ],
+  "caught_line_from_test_honest": 0.281
+ },
+ "n": {
+  "tw": [
+   5984,
+   3632
+  ],
+  "malt": [
+   1907,
+   407
+  ],
+  "ib": [
+   205,
+   32
+  ]
+ }
+}

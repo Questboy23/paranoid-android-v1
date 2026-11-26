@@ -1,0 +1,21 @@
+{
+ "100": {
+  "caught_median": 0.6575,
+  "caught_min": 0.6296,
+  "draws": 10
+ },
+ "150": {
+  "caught_median": 0.6917,
+  "caught_min": 0.64,
+  "draws": 10
+ },
+ "200": {
+  "caught_median": 0.6992,
+  "caught_min": 0.6369,
+  "draws": 10
+ },
+ "265": {
+  "caught": 0.7291,
+  "note": "5-fold cross-fit, about 265 tasks labelled per fold"
+ }
+}

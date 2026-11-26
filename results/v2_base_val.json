@@ -1,0 +1,56 @@
+{
+ "readers": [
+  "v4",
+  "canon",
+  "knn",
+  "mil",
+  "mil_aug",
+  "mil_task_aug",
+  "e2e"
+ ],
+ "n": 1791,
+ "v4": {
+  "auc": 0.953,
+  "catch": 0.7591
+ },
+ "canon": {
+  "auc": 0.9515,
+  "catch": 0.7376
+ },
+ "knn": {
+  "auc": 0.8129,
+  "catch": 0.4827
+ },
+ "mil": {
+  "auc": 0.9025,
+  "catch": 0.6729
+ },
+ "mil_aug": {
+  "auc": 0.8814,
+  "catch": 0.5829
+ },
+ "mil_task_aug": {
+  "auc": 0.8844,
+  "catch": 0.6026
+ },
+ "e2e": {
+  "auc": 0.9398,
+  "catch": 0.7526
+ },
+ "v2_embed": {
+  "auc": 0.9515,
+  "catch": 0.7835
+ },
+ "v5_stack": {
+  "catch": 0.7938,
+  "auc": 0.9588,
+  "catch_ci": [
+   0.695,
+   0.888
+  ]
+ },
+ "v2_embed_ci": [
+  0.692,
+  0.871
+ ]
+}

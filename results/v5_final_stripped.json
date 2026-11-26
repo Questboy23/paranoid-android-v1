@@ -1,0 +1,1 @@
+{"readers": ["v4", "canon", "e2e", "knn", "mil", "mil_aug", "mil_task_aug"], "auc": 0.9602, "auc_ci": [0.951, 0.968], "tpr5": 0.8128, "tpr5_ci": [0.766, 0.857]}
